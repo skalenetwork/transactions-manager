@@ -25,6 +25,7 @@ from .attempt_manager import AttemptManagerV2, RedisAttemptStorage
 from .eth import Eth
 from .log import init_logger
 from .processor import Processor
+from .resources import stcd
 from .txpool import TxPool
 from .utils import config_string
 from .wallet import init_wallet
@@ -41,6 +42,7 @@ def run_proc():
         RedisAttemptStorage(),
         wallet.address
     )
+
     proc = Processor(eth, pool, attempt_manager, wallet)
     logger.info('Starting transaction processor')
     proc.run()
