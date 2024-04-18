@@ -220,6 +220,7 @@ class Processor:
     def run(self) -> None:
         while True:
             try:
+                stcd.gauge('tm.pool.size', self.pool.size)
                 self.process_next()
             except Exception:
                 logger.exception('Failed to process tx')
