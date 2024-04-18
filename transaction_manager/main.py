@@ -25,7 +25,6 @@ from .attempt_manager import AttemptManagerV2, RedisAttemptStorage
 from .eth import Eth
 from .log import init_logger
 from .processor import Processor
-from .resources import stcd
 from .txpool import TxPool
 from .utils import config_string
 from .wallet import init_wallet
