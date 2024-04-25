@@ -28,4 +28,4 @@ from .config import ALLOWED_TS_DIFF, ENDPOINT, REDIS_URI, STATSD_HOST, STATSD_PO
 cpool: redis.ConnectionPool = redis.ConnectionPool.from_url(REDIS_URI)
 rs: redis.Redis = redis.Redis(connection_pool=cpool)
 w3: Web3 = init_web3(ENDPOINT, ts_diff=ALLOWED_TS_DIFF)
-stcd: statsd.StatsClient = statsd.StatsClient(STATSD_HOST, STATSD_PORT)
+stdc: statsd.StatsClient = statsd.StatsClient(STATSD_HOST, STATSD_PORT)

@@ -32,7 +32,7 @@ from .eth import (
     is_replacement_underpriced,
     ReceiptTimeoutError
 )
-from .resources import stcd
+from .resources import stdc
 from .structures import Tx, TxStatus
 from .txpool import TxPool
 
@@ -92,7 +92,6 @@ class Processor:
 
         if tx_hash is None:
             tx.status = TxStatus.UNSENT
-            stcd.increase('tm.transaction.unsent')
             raise SendingError(err)
 
         tx.set_as_sent(tx_hash)
@@ -115,7 +114,6 @@ class Processor:
         except ReceiptTimeoutError as err:
             logger.info(f'{tx.tx_id} is not mined within {max_time}')
             tx.status = TxStatus.TIMEOUT
-            stcd.increase('tm.transaction.timeout')
             raise WaitTimeoutError(err)
 
         rstatus = self.eth.wait_for_receipt(
@@ -141,7 +139,6 @@ class Processor:
         h, r = self.get_exec_data(tx)
         if h is None or r not in (0, 1):
             tx.status = TxStatus.UNCONFIRMED
-            stcd.increase('tm.transaction.unconfirmed')
             raise ConfirmationError('Tx is not confirmed')
         logger.info('Setting tx %s as completed, result %d', tx.tx_id, r)
         tx.set_as_completed(h, r)
@@ -195,6 +192,8 @@ class Processor:
         try:
             yield tx
         finally:
+            stdc.gauge('tm.attempt', tx.attempts)
+            stdc.increase(f'tm.transaction.{tx.status.name}')
             if tx.is_sent():
                 self.attempt_manager.save()
             if not tx.is_completed() and tx.is_last_attempt():
@@ -214,13 +213,13 @@ class Processor:
             with self.acquire_tx(tx) as tx:
                 logger.info(
                     'Previous attempt %s', self.attempt_manager.current)
-                with stcd.timer("tm.transaction.time"):
+                with stdc.timer('tm.transaction.time'):
                     self.process(tx)
 
     def run(self) -> None:
         while True:
             try:
-                stcd.gauge('tm.pool.size', self.pool.size)
+                stdc.gauge('tm.pool.size', self.pool.size)
                 self.process_next()
             except Exception:
                 logger.exception('Failed to process tx')
