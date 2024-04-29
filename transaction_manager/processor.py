@@ -193,7 +193,7 @@ class Processor:
             yield tx
         finally:
             stdc.gauge('tm.attempt', tx.attempts)
-            stdc.increase(f'tm.transaction.{tx.status.name}')
+            stdc.incr(f'tm.transaction.{tx.status.name}')
             if tx.is_sent():
                 self.attempt_manager.save()
             if not tx.is_completed() and tx.is_last_attempt():
