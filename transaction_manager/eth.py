@@ -36,7 +36,7 @@ from .config import (
     MAX_WAITING_TIME,
     TARGET_REWARD_PERCENTILE
 )
-from .resources import w3 as gw3
+from .resources import stdc, w3 as gw3
 from .structures import Tx
 
 logger = logging.getLogger(__name__)
@@ -83,7 +83,8 @@ class Eth:
 
     @cached_property
     def chain_id(self) -> int:
-        return self.w3.eth.chain_id
+        with stdc.timer('tm.chain_id_request'):
+            return self.w3.eth.chain_id
 
     def get_balance(self, address: str) -> int:
         checksum_addres = self.w3.to_checksum_address(address)

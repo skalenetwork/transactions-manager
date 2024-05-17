@@ -1,1 +1,2 @@
 skale.py==6.2b0
+statsd==4.0.1

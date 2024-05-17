@@ -41,6 +41,7 @@ def run_proc():
         RedisAttemptStorage(),
         wallet.address
     )
+
     proc = Processor(eth, pool, attempt_manager, wallet)
     logger.info('Starting transaction processor')
     proc.run()
