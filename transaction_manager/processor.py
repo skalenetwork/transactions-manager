@@ -32,6 +32,7 @@ from .eth import (
     is_replacement_underpriced,
     ReceiptTimeoutError
 )
+from .resources import stdc
 from .structures import Tx, TxStatus
 from .txpool import TxPool
 
@@ -191,6 +192,8 @@ class Processor:
         try:
             yield tx
         finally:
+            stdc.gauge('tm.attempt', tx.attempts)
+            stdc.incr(f'tm.transaction.{tx.status.name}')
             if tx.is_sent():
                 self.attempt_manager.save()
             if not tx.is_completed() and tx.is_last_attempt():
@@ -210,11 +213,13 @@ class Processor:
             with self.acquire_tx(tx) as tx:
                 logger.info(
                     'Previous attempt %s', self.attempt_manager.current)
-                self.process(tx)
+                with stdc.timer('tm.transaction.time'):
+                    self.process(tx)
 
     def run(self) -> None:
         while True:
             try:
+                stdc.gauge('tm.pool.size', self.pool.size)
                 self.process_next()
             except Exception:
                 logger.exception('Failed to process tx')

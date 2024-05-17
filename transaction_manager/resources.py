@@ -18,12 +18,14 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import redis
+import statsd  # type: ignore
 
 from skale.utils.web3_utils import init_web3  # type: ignore
 from web3 import Web3
 
-from .config import ALLOWED_TS_DIFF, ENDPOINT, REDIS_URI
+from .config import ALLOWED_TS_DIFF, ENDPOINT, REDIS_URI, STATSD_HOST, STATSD_PORT
 
 cpool: redis.ConnectionPool = redis.ConnectionPool.from_url(REDIS_URI)
 rs: redis.Redis = redis.Redis(connection_pool=cpool)
 w3: Web3 = init_web3(ENDPOINT, ts_diff=ALLOWED_TS_DIFF)
+stdc: statsd.StatsClient = statsd.StatsClient(STATSD_HOST, STATSD_PORT)
