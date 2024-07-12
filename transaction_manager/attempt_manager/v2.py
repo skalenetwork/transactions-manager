@@ -35,6 +35,7 @@ from ..config import (
     MIN_PRIORITY_FEE
 )
 from ..eth import Eth
+from ..resources import stdc
 from ..structures import Attempt, Fee, Tx
 
 logger = logging.getLogger(__name__)
@@ -165,8 +166,11 @@ class AttemptManagerV2(BaseAttemptManager):
                 last.fee.max_fee_per_gas,  # type: ignore
                 min_fee=estimated_base_fee
             )
+            stdc.gauge('tm.max_priority_fee', tip)
+            stdc.gauge('tm.max_fee_per_gas', gap)
             next_fee = Fee(max_priority_fee_per_gas=tip, max_fee_per_gas=gap)
             next_wait_time = self.next_waiting_time(next_index)
+            stdc.gauge('tm.next_wating_time', gap)
 
         logger.info('Next fee %s', next_fee)
         tx.fee, tx.nonce = next_fee, nonce
