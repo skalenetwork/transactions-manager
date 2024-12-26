@@ -15,11 +15,11 @@ create_redis_dir() {
 }
 
 run_container() {
-    docker-compose up --build --force-recreate -d redis
+    docker compose up --build --force-recreate -d redis
 }
 
 shutdown_container() {
-    docker-compose down --rmi local
+    docker compose down --rmi local
 }
 
 cleanup_redis_dir() {
