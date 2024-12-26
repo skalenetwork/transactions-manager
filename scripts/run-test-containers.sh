@@ -26,15 +26,15 @@ create_redis_dir() {
 }
 
 build() {
-    docker-compose build --force-rm $@
+    docker compose build --force-rm $@
 }
 
 run_containers() {
-    docker-compose up -d $@
+    docker compose up -d $@
 }
 
 shutdown_containers() {
-    docker-compose down --rmi local
+    docker compose down --rmi local
 }
 
 cleanup_skale_dir() {
